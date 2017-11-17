@@ -5,7 +5,6 @@ Created on Fri Nov  3 16:05:15 2017
 @author: Hui
 """
 
-
 from scipy.stats import truncnorm
 import numpy as np
 from matplotlib import pyplot as plt
@@ -39,14 +38,13 @@ def prop_scores(df_reliability=6,mean_bias=0,sd_bias=5,n=50):
     prop_scores=np.zeros((n,n))
     reliability = np.random.chisquare(df_reliability, size=n)
     bias=np.random.normal(mean_bias,sd_bias,size=n)
-    error=np.random.normal(0,reliability)
     for i in range(0,n):
         for j in range(0,n):
-            # the score of proposal j given by PI i
-            prop_scores[i,j]=true_scores[j]+bias[i]+error[i]
+            # the score of proposal i given by PI j
+            prop_scores[i,j]=np.random.normal(true_scores[i]+bias[j],reliability[j])
     return prop_scores
 
-prop_scores=prop_scores(1,0,5)  #call function and assign different values
+prop_scores=prop_scores(6,0,5)  #call function and assign different values
 
 ###############################################################
 ###Step 3 :                                                 ###
@@ -54,37 +52,22 @@ prop_scores=prop_scores(1,0,5)  #call function and assign different values
 ###show that the parameters chosen are reasonable.          ###
 ###############################################################
 
-prop_average_scores=np.mean(prop_scores,axis=0)
+prop_average_scores=np.mean(prop_scores,axis=1)
 #np.savetxt('prop_score_HYuan.csv',prop_scores)   #Output to files
-
-#plot the scores of each proposal given by different PIs
-plt.subplot(211)
-plt.plot(true_scores, 'r--^',label='true_score')
-plt.plot(prop_scores, 'b--^')
-plt.legend(bbox_to_anchor=(0.7, 1))
-plt.xlabel('proposal number')
-plt.ylabel('scores')
-
-#plot the average scores of each proposal given by all PIs
-plt.subplot(212)
+prop_average_scores=np.mean(prop_scores,axis=1)
 plt.plot(true_scores, 'r--^',label='true_score')
 plt.plot(prop_average_scores, 'b--^',label='PI_avg_score')
 plt.legend(bbox_to_anchor=(0.7, 1))
 plt.xlabel('proposal number')
 plt.ylabel('scores')
+#plt.savefig('pa1_HYuan.png') #save plots
 plt.show()
 
-##################################################################
-###Conclusion:                                                 ###
-###1.When sd_true_scores>=10 and mean_bias=0,the simulation of ###
-###prop_scores given by PIs mathches true_scores very well,    ###
-###indicating the parameters chosen are reasonable.            ### 
-###2.The parameter reliability shows the variance of the scores###
-###given by PIs, large degree of freedom of the reliability    ###
-###makess the scores spread far from average value.            ###
-###3.Change of other parameters will not make much difference  ###
-###on the prop_average_scores given by PIs.                    ###
-##################################################################
-
-
-
+#################################################################
+###Conclusion:                                                ###
+###When sd_true_scores>=10 and mean_bias=0, the simulation of ###
+###prop_scores given by PIs mathches true_scores very well,   ###
+###indicating the parameters chosen are reasonable.           ### 
+###Change of other parameters will not make much difference on###
+###the prop_average_scores given by PIs.                      ###
+#################################################################
